@@ -6,6 +6,8 @@
 
 #define TICKS_MS 10
 
+#define QUANTUM_MS 500
+
 #include <stdint.h>
 #include <sys/types.h>
 

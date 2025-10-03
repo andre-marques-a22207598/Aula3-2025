@@ -32,6 +32,51 @@ int enqueue_pcb(queue_t* q, pcb_t* task) {
     return 1;
 }
 
+/* Remove e retorna o pcb com menor tempo ms.
+ * Retorna NULL se q==NULL ou fila vazia.
+ * Liberta o nó da fila (queue_elem_t) mas NÃO libera o pcb_t retornado.
+ */
+pcb_t* dequeue_shortest_job(queue_t* q) {
+    if (!q || !q->head) return NULL;   // fila inválida ou vazia
+
+    // assumimos inicialmente que o head é o melhor candidato
+    queue_elem_t *best = q->head;
+    queue_elem_t *best_prev = NULL;
+
+    // prev e it para percorrer a lista a partir do segundo nó
+    queue_elem_t *prev = q->head;
+    queue_elem_t *it   = q->head->next;
+
+    // percorre a lista e encontra o nó cuja pcb->time_ms é o menor
+    while (it) {
+        if (it->pcb->time_ms < best->pcb->time_ms) {
+            best = it;
+            best_prev = prev;
+        }
+        prev = it;
+        it   = it->next;
+    }
+
+    // remove 'best' da lista encadeada
+    if (best_prev) {
+        best_prev->next = best->next;     // pula o best
+    } else {
+        // best era o head
+        q->head = best->next;
+    }
+
+    // se best era o tail, atualiza tail
+    if (best == q->tail) {
+        q->tail = best_prev;
+    }
+
+    // extrai o pcb do nó, libera o nó e retorna o pcb
+    pcb_t *task = best->pcb;
+    free(best);
+    return task;
+}
+
+
 pcb_t* dequeue_pcb(queue_t* q) {
     if (!q || !q->head) return NULL;
 
