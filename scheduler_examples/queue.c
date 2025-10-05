@@ -5,6 +5,7 @@
 
 pcb_t *new_pcb(pid_t pid, uint32_t sockfd, uint32_t time_ms) {
     pcb_t * new_task = malloc(sizeof(pcb_t));
+
     if (!new_task) return NULL;
 
     new_task->pid = pid;
@@ -13,8 +14,11 @@ pcb_t *new_pcb(pid_t pid, uint32_t sockfd, uint32_t time_ms) {
     new_task->sockfd = sockfd;
     new_task->time_ms = time_ms;
     new_task->ellapsed_time_ms = 0;
+    new_task->priority = 0;
     return new_task;
 }
+
+
 
 int enqueue_pcb(queue_t* q, pcb_t* task) {
     queue_elem_t* elem = malloc(sizeof(queue_elem_t));
@@ -112,4 +116,36 @@ queue_elem_t *remove_queue_elem(queue_t* q, queue_elem_t* elem) {
     }
     printf("Queue element not found in queue\n");
     return NULL;
+}
+/**
+ * @brief Move um PCB da blocked queue para outra fila (por exemplo, ready queue do MLFQ).
+ *
+ * Esta função assume que o PCB já está na blocked queue e deve ser removido
+ * quando o tempo de bloqueio termina.
+ */
+void move_from_blocked_to_ready(queue_t *blocked_q, queue_t *dest_q, pcb_t *pcb) {
+    if (!blocked_q || !dest_q || !pcb) return;
+
+    // percorre a blocked queue para encontrar e remover o PCB
+    queue_elem_t *it = blocked_q->head;
+    queue_elem_t *prev = NULL;
+
+    while (it) {
+        if (it->pcb == pcb) {
+            // remove da blocked queue
+            if (prev)
+                prev->next = it->next;
+            else
+                blocked_q->head = it->next;
+
+            if (it == blocked_q->tail)
+                blocked_q->tail = prev;
+
+            free(it); // liberta o nó, mas não o PCB
+            break;
+        }
+        prev = it;
+        it = it->next;
+    }
+    enqueue_pcb(dest_q, pcb);
 }

@@ -27,7 +27,7 @@ void rr_scheduler(uint32_t current_time_ms, queue_t *rq, pcb_t **cpu_task) {
             *cpu_task = NULL;
         }
             // Quantum expirou
-        else if (current_time_ms - (*cpu_task)->slice_start_ms >= QUANTUM_MS) {
+        else if (current_time_ms - (*cpu_task)->slice_start_ms >= TIME_SLICE) {
             printf("[RR] Process %d quantum ended at %u ms, preempting and moving to end of queue\n",
                    (*cpu_task)->pid, current_time_ms);
 
