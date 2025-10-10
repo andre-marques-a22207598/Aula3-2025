@@ -42,8 +42,15 @@ void rr_scheduler(uint32_t current_time_ms, queue_t *rq, pcb_t **cpu_task) {
         *cpu_task = dequeue_pcb(rq);
         if (*cpu_task) {
             (*cpu_task)->slice_start_ms = current_time_ms;  // reinicia quantum
-            printf("[RR] Process %d starts running at %u ms\n",
-                   (*cpu_task)->pid, current_time_ms);
+
+            if (!(*cpu_task)->started) {
+                (*cpu_task)->started = 1;
+                (*cpu_task)->first_run_time_ms = current_time_ms;
+                uint32_t response_time = current_time_ms - (*cpu_task)->arrival_time_ms;
+                printf("[RR] Process %d starts running at %u ms — RESPONSE TIME: %u ms\n",
+                       (*cpu_task)->pid, current_time_ms, response_time);
+            }
         }
     }
+
 }

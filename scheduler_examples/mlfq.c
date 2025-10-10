@@ -9,7 +9,7 @@
 
 static int mlfq_inicializado = 0;
 
-void mlfq_scheduler(uint32_t current_time_ms, queue_t *rq, queue_t *blocked_q, pcb_t **cpu_task) {
+void mlfq_scheduler(uint32_t current_time_ms, queue_t *rq, queue_t *command_queue, pcb_t **cpu_task) {
     static mlfq_t mlfq;
     if (!mlfq_inicializado) {
         for (int i = 0; i < MLFQ_LEVELS; ++i) {
@@ -41,7 +41,8 @@ void mlfq_scheduler(uint32_t current_time_ms, queue_t *rq, queue_t *blocked_q, p
                 perror("write");
             }
             // Application finished and can be removed (this is FIFO after all)
-            free((*cpu_task));
+            
+            enqueue_pcb(command_queue, *cpu_task);
             (*cpu_task) = NULL;
 
         } else if (current_time_ms - (*cpu_task)->slice_start_ms >= TIME_SLICE) {

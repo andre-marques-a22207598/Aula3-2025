@@ -10,6 +10,6 @@ typedef struct {
     queue_t queues[MLFQ_LEVELS];
 } mlfq_t;
 
-void mlfq_scheduler(uint32_t current_time_ms, queue_t *rq, queue_t *blocked_q, pcb_t **cpu_task);
+void mlfq_scheduler(uint32_t current_time_ms, queue_t *rq, queue_t *command_queue, pcb_t **cpu_task);
 
 #endif

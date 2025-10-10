@@ -149,6 +149,8 @@ void check_new_commands(queue_t *command_queue, queue_t *blocked_queue, queue_t 
             current_pcb->ellapsed_time_ms = 0;
             current_pcb->status = TASK_RUNNING;
             enqueue_pcb(ready_queue, current_pcb);
+            current_pcb->arrival_time_ms = current_time_ms;
+            current_pcb->started = 0;
             DBG("Process %d requested RUN for %d ms\n", current_pcb->pid, current_pcb->time_ms);
         } else if (msg.request == PROCESS_REQUEST_BLOCK) {
             current_pcb->pid = msg.pid; // Set the pid from the message
@@ -318,7 +320,7 @@ int main(int argc, char *argv[]) {
                 rr_scheduler(current_time_ms, &ready_queue, &CPU);
                 break;
             case SCHED_MLFQ:
-                mlfq_scheduler(current_time_ms, &ready_queue, &blocked_queue, &CPU);
+                mlfq_scheduler(current_time_ms, &ready_queue, &command_queue, &CPU);
                 break;
 
             default:

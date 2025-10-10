@@ -20,6 +20,9 @@ typedef struct pcb_st{
     uint32_t sockfd;               // Socket file descriptor for communication with the application
     uint32_t last_update_time_ms;  // Last time the PCB was updataed
     int priority;
+    uint32_t arrival_time_ms;   // momento em que entrou no sistema
+    int started;
+    uint32_t first_run_time_ms;
 } pcb_t;
 
 // Define singly linked list elements
